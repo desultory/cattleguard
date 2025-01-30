@@ -2,6 +2,7 @@ from pathlib import Path
 from re import DOTALL, finditer, search
 from subprocess import run
 
+from tpm_types import TPMNVPublic
 
 class TPM2ExecutionError(Exception):
     pass
@@ -26,12 +27,12 @@ def run_cmd(cmd, return_output=True, stdin=None):
     if cmd.returncode != 0:
         handle_error(cmd)
     if cmd.stdout and return_output:
-        return cmd.stdout
+        return (cmd.stdout.decode().strip())
     return cmd
 
 
 def nvreadpublic():
-    return run_cmd(["tpm2_nvreadpublic"])
+    return TPMNVPublic.from_output(run_cmd(["tpm2_nvreadpublic"]))
 
 
 def nvread(handle):
