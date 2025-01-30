@@ -84,6 +84,11 @@ class TPMNVPublic:
     size: int
 
     @staticmethod
+    def from_system():
+        from tpm_funcs import run_tpm2_cmd
+        return TPMNVPublic.from_output(run_tpm2_cmd("nvreadpublic"))
+
+    @staticmethod
     def from_output(output: str):
         """Returns TPMNVPublic objects from tpm2_nvreadpublic output"""
         if isinstance(output, str):
@@ -126,6 +131,11 @@ class TPMNVPublic:
                 TPMNVPublics.append(TPMNVPublic(start_address, name, hash_alg, attributes, size))
                 start_address, name, hash_alg, attributes, size = None, None, None, None, None
                 continue
+
+        # Add the last entry if it exists
+        if start_address and name and hash_alg and attributes and size:
+            TPMNVPublics.append(TPMNVPublic(start_address, name, hash_alg, attributes, size))
+
         if len(TPMNVPublics) == 0:
             raise ValueError("No TPMNVPublic objects found in output")
         elif len(TPMNVPublics) == 1:

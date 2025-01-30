@@ -4,7 +4,8 @@ from re import search
 
 from zenlib.logging import loggify
 
-from tpm_wrapper import createprimary, evictcontrol, get_handles, getrandom, nvread
+from tpm_funcs import createprimary, evictcontrol, getrandom, nvread
+from tpm_types import TPMNVPublic
 
 DEFAULT_CONFIG = {"seal_pcrs": [0, 7], "primary_hierarchy": "owner", "parent_auth": None, "primary_auth": "password"}
 
@@ -20,10 +21,14 @@ class CattleGuard:
         else:
             self.load_config()
         self.logger.debug(f"Checking TPM by reading random data: {bytes(getrandom(32))}")
-        self.handles = get_handles()
-        if self.handles:
-            self.logger.info("Found TPM handles: %s" % self.handles)
+        if handles := self.nvram_public_regions:
+            handle_names = " ".join([handle.name for handle in handles])
+            self.logger.info("Found TPM handles: %s" % handle_names)
         self.map_data = {}
+
+    @property
+    def nvram_public_regions(self):
+        return TPMNVPublic.from_system()
 
     def create_config(self):
         """Create the default json config file"""
