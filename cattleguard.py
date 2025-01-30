@@ -1,3 +1,4 @@
+from json import dump, load
 from pathlib import Path
 from re import search
 
@@ -26,8 +27,6 @@ class CattleGuard:
 
     def create_config(self):
         """Create the default json config file"""
-        from json import dump
-
         self.config = DEFAULT_CONFIG
         self.logger.debug("Default config: %s" % self.config)
         self.logger.info("Writing default config to file: %s" % self.config_file)
@@ -36,8 +35,6 @@ class CattleGuard:
 
     def load_config(self):
         """Reads the json config file"""
-        from json import load
-
         self.logger.info("Loading config from file: %s" % self.config_file)
         with open(self.config_file, "r") as file:
             self.config = load(file)
